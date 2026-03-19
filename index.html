@@ -101,13 +101,13 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: center;
+        justify-content: flex-start;
         cursor: pointer;
         transition:
           border-color 0.2s,
           background 0.2s;
         position: relative;
-        overflow: hidden;
+        overflow: visible;
       }
       #upload-zone.drag-over {
         border-color: var(--accent);
@@ -121,6 +121,12 @@
       .upload-hint {
         text-align: center;
         pointer-events: none;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
       }
       .upload-hint svg {
         opacity: 0.35;
@@ -442,6 +448,90 @@
         transform: translateX(-50%) translateY(0);
       }
 
+      /* Modal for batch result preview */
+      #result-modal {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.75);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        padding: 20px;
+      }
+      #result-modal.visible {
+        display: flex;
+      }
+      .result-modal-content {
+        background: var(--surface);
+        border-radius: var(--radius);
+        max-width: 90vw;
+        max-height: 90vh;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      }
+      .result-modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--border);
+      }
+      .result-modal-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--text);
+        max-width: 400px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .result-modal-close {
+        background: none;
+        border: none;
+        color: var(--text-dim);
+        cursor: pointer;
+        padding: 4px;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.15s;
+      }
+      .result-modal-close:hover {
+        background: var(--surface2);
+        color: var(--text);
+      }
+      .result-modal-body {
+        flex: 1;
+        overflow: auto;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--bg);
+      }
+      .result-modal-body img {
+        max-width: 100%;
+        max-height: 70vh;
+        border-radius: 8px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      }
+      .result-modal-footer {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        padding: 16px 20px;
+        border-top: 1px solid var(--border);
+      }
+      .result-modal-footer .btn {
+        width: auto;
+        padding: 10px 24px;
+      }
+
       /* Divider */
       .divider {
         height: 1px;
@@ -499,7 +589,294 @@
       footer a:hover {
         color: var(--accent);
       }
+
+      /* ─── Batch mode ───────────────────────────────────────────────── */
+      /* Batch preview */
+      #batch-preview-wrap {
+        display: none;
+        flex-direction: column;
+        padding: 16px;
+        gap: 12px;
+        width: 100%;
+        min-height: 300px;
+        background: var(--surface);
+        border: 2px dashed var(--border);
+        border-radius: var(--radius);
+        margin-top: 0;
+      }
+      #batch-preview-wrap.visible {
+        display: flex;
+      }
+      .batch-preview-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 0.85rem;
+      }
+      .batch-preview-header span:first-child {
+        color: var(--text-dim);
+        font-weight: 500;
+      }
+      .preview-filename {
+        color: var(--text);
+        font-weight: 600;
+        max-width: 200px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      #batch-preview-canvas {
+        max-width: 100%;
+        border-radius: 8px;
+        background: var(--surface2);
+        cursor: crosshair;
+      }
+      .batch-preview-controls {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+      }
+      .preview-compare-btn {
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        color: var(--text-dim);
+        padding: 8px 16px;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        cursor: pointer;
+        transition: all 0.15s;
+        user-select: none;
+      }
+      .preview-compare-btn:hover {
+        border-color: var(--accent);
+        color: var(--text);
+      }
+      .preview-compare-btn:active {
+        background: var(--accent);
+        color: #fff;
+        border-color: var(--accent);
+      }
+
+      /* File list grid */
+      #file-list {
+        display: none;
+        margin-top: 16px;
+        flex-direction: column;
+        gap: 8px;
+      }
+      #file-list.visible {
+        display: flex;
+      }
+      .file-list-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 0.78rem;
+        color: var(--text-dim);
+        padding: 0 2px 6px;
+        border-bottom: 1px solid var(--border);
+      }
+      .file-list-header strong {
+        color: var(--text);
+      }
+      .file-items {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        max-height: 240px;
+        overflow-y: auto;
+        padding-right: 2px;
+      }
+      .file-items::-webkit-scrollbar {
+        width: 4px;
+      }
+      .file-items::-webkit-scrollbar-track {
+        background: var(--surface2);
+        border-radius: 4px;
+      }
+      .file-items::-webkit-scrollbar-thumb {
+        background: var(--border);
+        border-radius: 4px;
+      }
+      .file-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 10px;
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        font-size: 0.82rem;
+        transition:
+          border-color 0.15s,
+          background 0.15s;
+        cursor: pointer;
+      }
+      .file-item:hover {
+        background: var(--surface);
+        border-color: var(--accent);
+      }
+      .file-item.selected {
+        border-color: var(--accent);
+        background: rgba(99, 102, 241, 0.08);
+        box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15);
+      }
+      .file-item.processing {
+        border-color: var(--accent);
+        background: rgba(99, 102, 241, 0.05);
+      }
+      .file-item.done {
+        border-color: var(--success);
+        background: rgba(34, 197, 94, 0.05);
+      }
+      .file-item.done.selected {
+        border-color: var(--success);
+        box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
+      }
+      .file-item.error {
+        border-color: var(--danger);
+        background: rgba(239, 68, 68, 0.05);
+      }
+      .file-thumb {
+        width: 36px;
+        height: 36px;
+        object-fit: cover;
+        border-radius: 5px;
+        flex-shrink: 0;
+        background: var(--border);
+      }
+      .file-info {
+        flex: 1;
+        min-width: 0;
+      }
+      .file-name {
+        font-weight: 600;
+        color: var(--text);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .file-status {
+        font-size: 0.73rem;
+        color: var(--text-dim);
+        margin-top: 2px;
+      }
+      .file-item.done .file-status {
+        color: var(--success);
+      }
+      .file-item.processing .file-status {
+        color: var(--accent);
+      }
+      .file-item.error .file-status {
+        color: var(--danger);
+      }
+      .file-status-icon {
+        flex-shrink: 0;
+        width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      /* Spinner */
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      .spinner {
+        width: 16px;
+        height: 16px;
+        border: 2px solid var(--border);
+        border-top-color: var(--accent);
+        border-radius: 50%;
+        animation: spin 0.7s linear infinite;
+      }
+
+      /* Progress bar */
+      #batch-progress-wrap {
+        display: none;
+        flex-direction: column;
+        gap: 6px;
+        margin-top: 4px;
+      }
+      #batch-progress-wrap.visible {
+        display: flex;
+      }
+      .progress-bar-bg {
+        width: 100%;
+        height: 6px;
+        background: var(--border);
+        border-radius: 4px;
+        overflow: hidden;
+      }
+      .progress-bar-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--accent), var(--accent-h));
+        border-radius: 4px;
+        width: 0%;
+        transition: width 0.3s ease;
+      }
+      .progress-label {
+        font-size: 0.76rem;
+        color: var(--text-dim);
+        text-align: right;
+      }
+
+      /* Batch mode switch in panel */
+      .batch-toggle-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+      }
+      .batch-toggle-label {
+        font-size: 0.82rem;
+        color: var(--text-dim);
+      }
+      .toggle-switch {
+        position: relative;
+        width: 36px;
+        height: 20px;
+        flex-shrink: 0;
+      }
+      .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+      .toggle-slider {
+        position: absolute;
+        inset: 0;
+        background: var(--border);
+        border-radius: 20px;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+      .toggle-slider::before {
+        content: "";
+        position: absolute;
+        left: 3px;
+        top: 3px;
+        width: 14px;
+        height: 14px;
+        background: white;
+        border-radius: 50%;
+        transition: transform 0.2s;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+      }
+      .toggle-switch input:checked + .toggle-slider {
+        background: var(--accent);
+      }
+      .toggle-switch input:checked + .toggle-slider::before {
+        transform: translateX(16px);
+      }
     </style>
+    <script
+      async
+      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1352669467098863"
+      crossorigin="anonymous"
+    ></script>
   </head>
   <body>
     <header>
@@ -523,7 +900,7 @@
       <!-- ── Left: canvas area ── -->
       <div>
         <div id="upload-zone">
-          <input type="file" id="file-input" accept="image/*" />
+          <input type="file" id="file-input" accept="image/*" multiple />
           <div class="upload-hint" id="upload-hint">
             <svg
               width="56"
@@ -542,7 +919,8 @@
             <p><strong data-i18n="uploadTitle">Drop image here</strong></p>
             <p data-i18n="uploadSub">or click to browse</p>
             <p style="margin-top: 8px; font-size: 0.75rem; opacity: 0.6">
-              PNG · JPG · WebP · GIF
+              PNG · JPG · WebP · GIF &nbsp;·&nbsp;
+              <span data-i18n="multiHint">supports multiple files</span>
             </p>
           </div>
 
@@ -550,6 +928,90 @@
             <canvas id="preview-canvas"></canvas>
             <div id="sel-overlay"></div>
             <div id="radial-dot"></div>
+          </div>
+        </div>
+
+        <!-- Batch preview area (outside upload-zone) -->
+        <div id="batch-preview-wrap" style="display: none">
+          <div class="batch-preview-header">
+            <span id="batch-preview-label" data-i18n="previewLabel"
+              >Preview</span
+            >
+            <span id="batch-preview-name" class="preview-filename"></span>
+          </div>
+          <div style="position: relative">
+            <canvas id="batch-preview-canvas"></canvas>
+            <div
+              id="batch-radial-hint"
+              style="
+                position: absolute;
+                bottom: 8px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: rgba(0, 0, 0, 0.6);
+                color: #fff;
+                padding: 4px 12px;
+                border-radius: 12px;
+                font-size: 0.75rem;
+                pointer-events: none;
+                opacity: 0;
+                transition: opacity 0.3s;
+              "
+            >
+              Click to set radial center
+            </div>
+          </div>
+          <!-- Radial center controls -->
+          <div
+            id="batch-radial-controls"
+            style="
+              display: none;
+              flex-direction: column;
+              gap: 10px;
+              padding: 8px 0;
+            "
+          >
+            <div class="slider-row">
+              <span class="slider-label" style="min-width: 16px">X</span>
+              <input
+                type="range"
+                id="batch-radial-x"
+                min="0"
+                max="100"
+                value="50"
+              />
+              <span
+                class="slider-val"
+                id="batch-radial-x-val"
+                style="min-width: 36px"
+                >50%</span
+              >
+            </div>
+            <div class="slider-row">
+              <span class="slider-label" style="min-width: 16px">Y</span>
+              <input
+                type="range"
+                id="batch-radial-y"
+                min="0"
+                max="100"
+                value="50"
+              />
+              <span
+                class="slider-val"
+                id="batch-radial-y-val"
+                style="min-width: 36px"
+                >50%</span
+              >
+            </div>
+          </div>
+          <div class="batch-preview-controls">
+            <button
+              class="preview-compare-btn"
+              id="compare-btn"
+              data-i18n="compareBtn"
+            >
+              Hold to compare original
+            </button>
           </div>
         </div>
 
@@ -567,6 +1029,29 @@
           <strong style="color: var(--text)">Apply Blur</strong> directly to
           blur the entire image
         </p>
+
+        <!-- ── Batch file list ── -->
+        <div id="file-list">
+          <div class="file-list-header">
+            <span
+              ><strong id="file-count-label">0</strong>
+              <span data-i18n="filesLoaded">files loaded</span></span
+            >
+            <span
+              id="batch-done-count"
+              style="display: none"
+              data-i18n-tpl="batchDoneCount"
+            ></span>
+          </div>
+          <div class="file-items" id="file-items"></div>
+          <!-- Progress -->
+          <div id="batch-progress-wrap">
+            <div class="progress-bar-bg">
+              <div class="progress-bar-fill" id="progress-fill"></div>
+            </div>
+            <div class="progress-label" id="progress-label">0 / 0</div>
+          </div>
+        </div>
       </div>
 
       <!-- ── Right: controls ── -->
@@ -596,6 +1081,22 @@
               <div class="step-num">4</div>
               <span data-i18n="step4">Download</span>
             </div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Batch mode toggle -->
+        <div>
+          <p class="panel-section-title" data-i18n="batchMode">Batch Mode</p>
+          <div class="batch-toggle-row">
+            <span class="batch-toggle-label" data-i18n="batchModeDesc"
+              >Process multiple images at once</span
+            >
+            <label class="toggle-switch">
+              <input type="checkbox" id="batch-toggle" />
+              <span class="toggle-slider"></span>
+            </label>
           </div>
         </div>
 
@@ -757,51 +1258,116 @@
 
         <!-- Actions -->
         <div class="action-area">
-          <button class="btn btn-primary" id="apply-btn" disabled>
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2.2"
+          <!-- Single-image buttons (default) -->
+          <div id="single-actions">
+            <button
+              class="btn btn-primary"
+              id="apply-btn"
+              disabled
+              style="margin-bottom: 10px"
             >
-              <path d="M12 2a10 10 0 1 1 0 20A10 10 0 0 1 12 2z" />
-              <path d="M8 12s1.5 2 4 2 4-2 4-2" />
-              <line x1="9" y1="9" x2="9.01" y2="9" />
-              <line x1="15" y1="9" x2="15.01" y2="9" />
-            </svg>
-            <span data-i18n="applyBtn">Apply Blur</span>
-          </button>
-          <button class="btn btn-primary" id="download-btn" disabled>
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2.2"
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.2"
+              >
+                <path d="M12 2a10 10 0 1 1 0 20A10 10 0 0 1 12 2z" />
+                <path d="M8 12s1.5 2 4 2 4-2 4-2" />
+                <line x1="9" y1="9" x2="9.01" y2="9" />
+                <line x1="15" y1="9" x2="15.01" y2="9" />
+              </svg>
+              <span data-i18n="applyBtn">Apply Blur</span>
+            </button>
+            <button
+              class="btn btn-primary"
+              id="download-btn"
+              disabled
+              style="margin-bottom: 10px"
             >
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-              <polyline points="7 10 12 15 17 10" />
-              <line x1="12" y1="15" x2="12" y2="3" />
-            </svg>
-            <span data-i18n="downloadBtn">Download Image</span>
-          </button>
-          <button class="btn btn-secondary" id="reset-btn" disabled>
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2.2"
-            >
-              <polyline points="1 4 1 10 7 10" />
-              <path d="M3.51 15a9 9 0 1 0 .49-4.5" />
-            </svg>
-            <span data-i18n="resetBtn">Reset / New Image</span>
-          </button>
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.2"
+              >
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+              <span data-i18n="downloadBtn">Download Image</span>
+            </button>
+            <button class="btn btn-secondary" id="reset-btn" disabled>
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.2"
+              >
+                <polyline points="1 4 1 10 7 10" />
+                <path d="M3.51 15a9 9 0 1 0 .49-4.5" />
+              </svg>
+              <span data-i18n="resetBtn">Reset / New Image</span>
+            </button>
+          </div>
+
+          <!-- Batch buttons (shown when batch mode on) -->
+          <div
+            id="batch-actions"
+            style="display: none; flex-direction: column; gap: 10px"
+          >
+            <button class="btn btn-primary" id="batch-apply-btn" disabled>
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.2"
+              >
+                <rect x="3" y="3" width="7" height="7" rx="1" />
+                <rect x="14" y="3" width="7" height="7" rx="1" />
+                <rect x="3" y="14" width="7" height="7" rx="1" />
+                <rect x="14" y="14" width="7" height="7" rx="1" />
+              </svg>
+              <span data-i18n="batchApplyBtn">Process All Images</span>
+            </button>
+            <button class="btn btn-primary" id="batch-download-btn" disabled>
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.2"
+              >
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+              <span data-i18n="batchDownloadBtn">Download All as ZIP</span>
+            </button>
+            <button class="btn btn-secondary" id="batch-reset-btn">
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.2"
+              >
+                <polyline points="1 4 1 10 7 10" />
+                <path d="M3.51 15a9 9 0 1 0 .49-4.5" />
+              </svg>
+              <span data-i18n="resetBtn">Reset / New Images</span>
+            </button>
+          </div>
         </div>
       </div>
     </main>
@@ -816,6 +1382,51 @@
 
     <div id="toast">✓ Done!</div>
 
+    <!-- Result preview modal -->
+    <div id="result-modal">
+      <div class="result-modal-content">
+        <div class="result-modal-header">
+          <span class="result-modal-title" id="modal-filename"></span>
+          <button class="result-modal-close" id="modal-close" title="Close">
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        </div>
+        <div class="result-modal-body">
+          <img id="modal-image" src="" alt="" />
+        </div>
+        <div class="result-modal-footer">
+          <button class="btn btn-secondary" id="modal-download">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+            <span data-i18n="downloadBtn">Download</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- JSZip for batch download -->
+    <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+
     <!-- ══════════════════════════════════════════════════════════════════ -->
     <!--  SCRIPT                                                            -->
     <!-- ══════════════════════════════════════════════════════════════════ -->
@@ -826,18 +1437,24 @@
       const LANGS = {
         en: {
           tagline: "Free · No watermark · 100% local",
-          uploadTitle: "Drop image here",
+          uploadTitle: "Drop images here",
           uploadSub: "or click to browse",
+          multiHint: "supports multiple files",
           canvasHint:
             '✦ Drag to select a region for partial blur · Or click <strong style="color:var(--text)">Apply Blur</strong> directly to blur the entire image',
           howToUse: "How to use",
-          step1: "Upload an image",
+          step1: "Upload image(s)",
           step2: "Draw a selection",
           step2Full:
             'Draw a selection <em style="opacity:.55;font-style:normal">(optional)</em>',
           optional: "(optional)",
           step3: "Choose blur mode & amount",
           step4: "Download",
+          batchMode: "Batch Mode",
+          batchModeDesc: "Process multiple images at once",
+          filesLoaded: "files loaded",
+          batchApplyBtn: "Process All Images",
+          batchDownloadBtn: "Download All as ZIP",
           blurMode: "Blur Mode",
           modeNormal: "Normal",
           modeMotion: "Motion",
@@ -861,11 +1478,24 @@
           toastApplied: "✓ Blur applied! Draw another area or download.",
           toastDownload: "✓ Image downloaded!",
           toastReset: "Ready for a new image!",
+          toastBatchDone: "✓ All images processed!",
+          toastZipReady: "✓ ZIP downloaded!",
+          statusPending: "Waiting…",
+          statusProcessing: "Processing…",
+          statusDone: "Done",
+          statusError: "Error",
+          previewLabel: "Preview",
+          compareBtn: "Hold to compare original",
+          clickToPreview: "Click to preview",
+          clickToViewResult: "Click to view result",
+          radialClickToSet: "Click image to set radial center",
+          radialCenterSet: "Radial center set",
         },
         zh: {
           tagline: "免费 · 无水印 · 纯本地处理",
           uploadTitle: "拖拽图片到此处",
           uploadSub: "或点击选择文件",
+          multiHint: "支持多文件同时选择",
           canvasHint:
             '✦ 拖拽选择局部区域进行模糊 · 或直接点击 <strong style="color:var(--text)">应用模糊</strong> 对整张图片模糊',
           howToUse: "使用步骤",
@@ -876,6 +1506,11 @@
           optional: "（可选）",
           step3: "选择模糊模式和强度",
           step4: "下载图片",
+          batchMode: "批量模式",
+          batchModeDesc: "同时处理多张图片",
+          filesLoaded: "张图片已加载",
+          batchApplyBtn: "批量处理全部图片",
+          batchDownloadBtn: "打包下载 ZIP",
           blurMode: "模糊模式",
           modeNormal: "普通",
           modeMotion: "运动",
@@ -898,6 +1533,18 @@
           toastApplied: "✓ 模糊已应用！可继续框选其他区域或下载。",
           toastDownload: "✓ 图片已下载！",
           toastReset: "已重置，请上传新图片。",
+          toastBatchDone: "✓ 全部图片处理完成！",
+          toastZipReady: "✓ ZIP 已下载！",
+          statusPending: "等待中…",
+          statusProcessing: "处理中…",
+          statusDone: "完成",
+          statusError: "出错",
+          previewLabel: "预览",
+          compareBtn: "按住查看原图",
+          clickToPreview: "点击查看预览",
+          clickToViewResult: "点击查看结果",
+          radialClickToSet: "点击图片设置径向中心",
+          radialCenterSet: "径向中心已设置",
         },
       };
 
@@ -918,7 +1565,6 @@
 
         // Update html lang attribute
         document.documentElement.lang = lang === "zh" ? "zh-CN" : "en";
-        console.log(document.documentElement.lang);
         // Update all [data-i18n] text nodes (innerHTML for nodes that may contain HTML)
         document.querySelectorAll("[data-i18n]").forEach((el) => {
           const key = el.getAttribute("data-i18n");
@@ -995,6 +1641,12 @@
       let radialCenter = null; // {x,y} in image coordinates (null = use rect centre)
       let settingRadial = false; // canvas click sets radial centre
 
+      // Batch state
+      let batchMode = false;
+      let batchFiles = []; // Array of { uid, file, img, name, status, resultDataURL, thumbURL, originalData, blurredData }
+      let batchProcessing = false;
+      let selectedBatchItem = null; // currently selected item for preview
+
       /* ── DOM refs ─────────────────────────────────────────────────────── */
       const uploadZone = $("upload-zone");
       const uploadHint = $("upload-hint");
@@ -1014,13 +1666,61 @@
       const downloadBtn = $("download-btn");
       const resetBtn = $("reset-btn");
 
+      // Batch DOM refs
+      const batchToggle = $("batch-toggle");
+      const singleActions = $("single-actions");
+      const batchActionsEl = $("batch-actions");
+      const batchApplyBtn = $("batch-apply-btn");
+      const batchDownloadBtn = $("batch-download-btn");
+      const batchResetBtn = $("batch-reset-btn");
+      const fileListEl = $("file-list");
+      const fileItemsEl = $("file-items");
+      const fileCountLabel = $("file-count-label");
+      const progressWrap = $("batch-progress-wrap");
+      const progressFill = $("progress-fill");
+      const progressLabel = $("progress-label");
+      const batchPreviewWrap = $("batch-preview-wrap");
+      const batchPreviewCanvas = $("batch-preview-canvas");
+      const batchPreviewCtx = batchPreviewCanvas.getContext("2d");
+      const batchPreviewName = $("batch-preview-name");
+      const compareBtn = $("compare-btn");
+      const batchRadialControls = $("batch-radial-controls");
+      const batchRadialX = $("batch-radial-x");
+      const batchRadialY = $("batch-radial-y");
+      const batchRadialXVal = $("batch-radial-x-val");
+      const batchRadialYVal = $("batch-radial-y-val");
+      const resultModal = $("result-modal");
+      const modalFilename = $("modal-filename");
+      const modalImage = $("modal-image");
+      const modalClose = $("modal-close");
+      const modalDownload = $("modal-download");
+
       /* ── Upload ──────────────────────────────────────────────────────── */
       uploadZone.addEventListener("click", (e) => {
         if (!e.target.closest("#canvas-wrap")) $("file-input").click();
       });
 
       $("file-input").addEventListener("change", (e) => {
-        if (e.target.files[0]) loadImage(e.target.files[0]);
+        const files = Array.from(e.target.files);
+        if (!files.length) return;
+        // Auto-switch to batch mode when multiple files are selected
+        if (files.length > 1 && !batchMode) {
+          batchToggle.checked = true;
+          batchMode = true;
+          singleActions.style.display = "none";
+          batchActionsEl.style.display = "flex";
+          canvasWrap.classList.remove("active");
+          uploadZone.classList.remove("has-image");
+          uploadHint.style.display = "";
+          canvasHint.style.display = "none";
+          srcImg = null;
+          originalData = null;
+        }
+        if (batchMode) {
+          loadBatchFiles(files);
+        } else {
+          loadImage(files[0]);
+        }
       });
 
       uploadZone.addEventListener("dragover", (e) => {
@@ -1033,8 +1733,28 @@
       uploadZone.addEventListener("drop", (e) => {
         e.preventDefault();
         uploadZone.classList.remove("drag-over");
-        const file = e.dataTransfer.files[0];
-        if (file && file.type.startsWith("image/")) loadImage(file);
+        const files = Array.from(e.dataTransfer.files).filter((f) =>
+          f.type.startsWith("image/"),
+        );
+        if (!files.length) return;
+        // Auto-switch to batch mode when multiple files are dropped
+        if (files.length > 1 && !batchMode) {
+          batchToggle.checked = true;
+          batchMode = true;
+          singleActions.style.display = "none";
+          batchActionsEl.style.display = "flex";
+          canvasWrap.classList.remove("active");
+          uploadZone.classList.remove("has-image");
+          uploadHint.style.display = "";
+          canvasHint.style.display = "none";
+          srcImg = null;
+          originalData = null;
+        }
+        if (batchMode) {
+          loadBatchFiles(files);
+        } else {
+          loadImage(files[0]);
+        }
       });
 
       function loadImage(file) {
@@ -1243,8 +1963,38 @@
           updateExtraControls();
           checkApplyReady();
           if (srcImg) redrawPreview();
+          if (batchMode) redrawBatchPreview();
+          updateBatchRadialHint();
         });
       });
+
+      // Update radial hint visibility for batch preview
+      function updateBatchRadialHint() {
+        const hint = document.getElementById("batch-radial-hint");
+        if (!hint) return;
+        if (batchMode && mode === "radial" && selectedBatchItem) {
+          hint.style.opacity = "1";
+          hint.textContent = batchRadialCenter
+            ? LANGS[currentLang].radialCenterSet
+            : LANGS[currentLang].radialClickToSet;
+          // Show radial controls
+          if (batchRadialControls) {
+            batchRadialControls.style.display = "flex";
+            // Initialize sliders if center not set yet
+            if (!batchRadialCenter) {
+              batchRadialX.value = 50;
+              batchRadialY.value = 50;
+              batchRadialXVal.textContent = "50%";
+              batchRadialYVal.textContent = "50%";
+            }
+          }
+        } else {
+          hint.style.opacity = "0";
+          if (batchRadialControls) {
+            batchRadialControls.style.display = "none";
+          }
+        }
+      }
 
       function updateExtraControls() {
         const ext = $("extra-controls");
@@ -1308,6 +2058,7 @@
         blurAmount = +blurSlider.value;
         blurValEl.textContent = blurAmount;
         smartRedraw();
+        if (batchMode) redrawBatchPreview();
       });
 
       angleSlider.addEventListener("input", () => {
@@ -1315,6 +2066,7 @@
         angleValEl.textContent = motionAngle + "°";
         $("angle-arrow").style.transform = `rotate(${motionAngle}deg)`;
         smartRedraw();
+        if (batchMode) redrawBatchPreview();
       });
 
       /* ── Live preview (blur selection or full image if no selection) ── */
@@ -1697,6 +2449,592 @@
         toast(LANGS[currentLang].toastReset);
       });
 
+      /* ══════════════════════════════════════════════════════════════════
+         BATCH MODE
+      ══════════════════════════════════════════════════════════════════ */
+
+      /* ── Batch mode toggle ───────────────────────────────────────────── */
+      batchToggle.addEventListener("change", () => {
+        batchMode = batchToggle.checked;
+        if (batchMode) {
+          // Switch to batch UI
+          singleActions.style.display = "none";
+          batchActionsEl.style.display = "flex";
+          // Hide single-image canvas, show file list area
+          canvasWrap.classList.remove("active");
+          uploadZone.classList.remove("has-image");
+          canvasHint.style.display = "none";
+          srcImg = null;
+          originalData = null;
+          // Show existing batch files if any, otherwise show upload zone
+          if (batchFiles.length) {
+            uploadZone.style.display = "none";
+            fileListEl.classList.add("visible");
+            batchPreviewWrap.classList.add("visible");
+            if (!selectedBatchItem) selectBatchItem(batchFiles[0]);
+          } else {
+            // No files yet, show upload zone for batch mode
+            uploadZone.style.display = "flex";
+            fileListEl.classList.remove("visible");
+            batchPreviewWrap.classList.remove("visible");
+          }
+        } else {
+          // Switch back to single mode
+          singleActions.style.display = "block";
+          batchActionsEl.style.display = "none";
+          fileListEl.classList.remove("visible");
+          batchPreviewWrap.classList.remove("visible");
+          uploadZone.style.display = "flex";
+          batchFiles = [];
+          selectedBatchItem = null;
+          fileItemsEl.innerHTML = "";
+          progressWrap.classList.remove("visible");
+          batchDownloadBtn.disabled = true;
+          batchApplyBtn.disabled = true;
+        }
+        $("file-input").value = "";
+      });
+
+      /* ── Load batch files ────────────────────────────────────────────── */
+      let _batchIdCounter = 0;
+
+      function loadBatchFiles(files) {
+        // Append to existing list (deduplicate by name+size)
+        const existing = new Set(
+          batchFiles.map((f) => f.file.name + "|" + f.file.size),
+        );
+        const newFiles = files.filter(
+          (f) => !existing.has(f.name + "|" + f.size),
+        );
+        if (!newFiles.length) return;
+
+        newFiles.forEach((file) => {
+          const uid = "bf-" + ++_batchIdCounter;
+          const item = {
+            uid,
+            file,
+            img: null,
+            name: file.name,
+            status: "pending",
+            resultDataURL: null,
+            thumbURL: null,
+          };
+          batchFiles.push(item);
+
+          // Create DOM node immediately with placeholder thumb
+          createFileItemNode(item);
+
+          // Load image asynchronously for real thumbnail
+          const url = URL.createObjectURL(file);
+          const img = new Image();
+          img.onload = () => {
+            item.img = img;
+            // Generate thumbnail data URL
+            const tc = document.createElement("canvas");
+            tc.width = 36;
+            tc.height = 36;
+            const tctx = tc.getContext("2d");
+            const side = Math.min(img.naturalWidth, img.naturalHeight);
+            const sx = (img.naturalWidth - side) / 2;
+            const sy = (img.naturalHeight - side) / 2;
+            tctx.drawImage(img, sx, sy, side, side, 0, 0, 36, 36);
+            item.thumbURL = tc.toDataURL("image/jpeg", 0.75);
+            URL.revokeObjectURL(url);
+            // Update thumb in existing node
+            const node = document.getElementById(item.uid);
+            if (node) {
+              const thumbEl = node.querySelector(".file-thumb");
+              if (thumbEl) thumbEl.src = item.thumbURL;
+            }
+            // If this is the selected item, update preview
+            if (selectedBatchItem && selectedBatchItem.uid === item.uid) {
+              updateBatchPreview();
+            }
+          };
+          img.onerror = () => URL.revokeObjectURL(url);
+          img.src = url;
+        });
+
+        fileListEl.classList.add("visible");
+        fileCountLabel.textContent = batchFiles.length;
+        batchApplyBtn.disabled = false;
+        batchDownloadBtn.disabled = true;
+        progressWrap.classList.remove("visible");
+
+        // Show batch preview area and select first item
+        if (batchFiles.length > 0) {
+          uploadZone.style.display = "none";
+          batchPreviewWrap.style.display = "flex";
+          batchPreviewWrap.classList.add("visible");
+          selectBatchItem(batchFiles[0]);
+        }
+      }
+
+      /* ── Create a new DOM node for a file item (called once per item) ── */
+      const PLACEHOLDER_THUMB =
+        "data:image/svg+xml,%3Csvg xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22 width%3D%2236%22 height%3D%2236%22%3E%3Crect width%3D%2236%22 height%3D%2236%22 fill%3D%22%23e2e8f0%22 rx%3D%225%22%2F%3E%3C%2Fsvg%3E";
+
+      /* ── Select a batch item for preview ─────────────────────────────── */
+      function selectBatchItem(item) {
+        if (selectedBatchItem) {
+          const prevNode = document.getElementById(selectedBatchItem.uid);
+          if (prevNode) prevNode.classList.remove("selected");
+        }
+        selectedBatchItem = item;
+        const node = document.getElementById(item.uid);
+        if (node) node.classList.add("selected");
+        batchPreviewName.textContent = item.name;
+        // Reset radial center when switching images
+        batchRadialCenter = null;
+        // Reset sliders to center
+        batchRadialX.value = 50;
+        batchRadialY.value = 50;
+        batchRadialXVal.textContent = "50%";
+        batchRadialYVal.textContent = "50%";
+        updateBatchPreview();
+        updateBatchRadialHint();
+      }
+
+      // Batch radial center (user-settable)
+      let batchRadialCenter = null; // {x, y} in canvas coordinates
+
+      /* ── Batch preview canvas click to set radial center ─────────────── */
+      batchPreviewCanvas.addEventListener("click", (e) => {
+        if (mode !== "radial") return;
+        const rect = batchPreviewCanvas.getBoundingClientRect();
+        const scaleX = batchPreviewCanvas.width / rect.width;
+        const scaleY = batchPreviewCanvas.height / rect.height;
+        const x = (e.clientX - rect.left) * scaleX;
+        const y = (e.clientY - rect.top) * scaleY;
+        setBatchRadialCenter(x, y);
+      });
+
+      // Set radial center and update sliders
+      function setBatchRadialCenter(x, y) {
+        batchRadialCenter = { x, y };
+        // Update sliders to match (as percentage)
+        if (batchPreviewCanvas.width > 0 && batchPreviewCanvas.height > 0) {
+          const xPct = Math.round((x / batchPreviewCanvas.width) * 100);
+          const yPct = Math.round((y / batchPreviewCanvas.height) * 100);
+          batchRadialX.value = xPct;
+          batchRadialY.value = yPct;
+          batchRadialXVal.textContent = xPct + "%";
+          batchRadialYVal.textContent = yPct + "%";
+        }
+        updateBatchPreview();
+        drawBatchRadialDot(x, y);
+        updateBatchRadialHint();
+      }
+
+      // Radial center slider events
+      batchRadialX.addEventListener("input", () => {
+        const pct = +batchRadialX.value;
+        batchRadialXVal.textContent = pct + "%";
+        if (batchPreviewCanvas.width > 0) {
+          const x = (pct / 100) * batchPreviewCanvas.width;
+          const y = batchRadialCenter
+            ? batchRadialCenter.y
+            : batchPreviewCanvas.height / 2;
+          setBatchRadialCenterFromSliders(x, y);
+        }
+      });
+
+      batchRadialY.addEventListener("input", () => {
+        const pct = +batchRadialY.value;
+        batchRadialYVal.textContent = pct + "%";
+        if (batchPreviewCanvas.height > 0) {
+          const x = batchRadialCenter
+            ? batchRadialCenter.x
+            : batchPreviewCanvas.width / 2;
+          const y = (pct / 100) * batchPreviewCanvas.height;
+          setBatchRadialCenterFromSliders(x, y);
+        }
+      });
+
+      function setBatchRadialCenterFromSliders(x, y) {
+        batchRadialCenter = { x, y };
+        updateBatchPreview();
+        drawBatchRadialDot(x, y);
+        updateBatchRadialHint();
+      }
+
+      // Draw radial center dot on batch preview
+      function drawBatchRadialDot(cx, cy) {
+        // Draw dot on top of current canvas content
+        batchPreviewCtx.save();
+        batchPreviewCtx.fillStyle = "#6366f1";
+        batchPreviewCtx.strokeStyle = "#fff";
+        batchPreviewCtx.lineWidth = 2;
+        batchPreviewCtx.beginPath();
+        batchPreviewCtx.arc(cx, cy, 6, 0, Math.PI * 2);
+        batchPreviewCtx.fill();
+        batchPreviewCtx.stroke();
+        // Draw crosshair
+        batchPreviewCtx.beginPath();
+        batchPreviewCtx.moveTo(cx - 10, cy);
+        batchPreviewCtx.lineTo(cx + 10, cy);
+        batchPreviewCtx.moveTo(cx, cy - 10);
+        batchPreviewCtx.lineTo(cx, cy + 10);
+        batchPreviewCtx.strokeStyle = "rgba(99, 102, 241, 0.5)";
+        batchPreviewCtx.lineWidth = 1;
+        batchPreviewCtx.stroke();
+        batchPreviewCtx.restore();
+      }
+
+      /* ── Update batch preview canvas with current blur settings ──────── */
+      function updateBatchPreview() {
+        if (!selectedBatchItem) {
+          return;
+        }
+        if (!selectedBatchItem.img) {
+          return;
+        }
+        const img = selectedBatchItem.img;
+        const w = img.naturalWidth;
+        const h = img.naturalHeight;
+
+        // Calculate display size (max 600px width)
+        const maxDisplayW = 600;
+        const scale = Math.min(1, maxDisplayW / w);
+        const dw = Math.round(w * scale);
+        const dh = Math.round(h * scale);
+
+        batchPreviewCanvas.width = dw;
+        batchPreviewCanvas.height = dh;
+
+        // Draw original
+        batchPreviewCtx.drawImage(img, 0, 0, dw, dh);
+
+        // Store original data for comparison
+        selectedBatchItem.originalData = batchPreviewCtx.getImageData(
+          0,
+          0,
+          dw,
+          dh,
+        );
+
+        // Apply blur if amount > 0
+        if (blurAmount > 0) {
+          const sel = { x: 0, y: 0, w: dw, h: dh };
+          // Use user-set radial center if available, otherwise use slider values
+          let radCenter;
+          if (batchRadialCenter) {
+            radCenter = batchRadialCenter;
+          } else {
+            // Use slider percentages
+            const xPct = +batchRadialX.value / 100;
+            const yPct = +batchRadialY.value / 100;
+            radCenter = { x: xPct * dw, y: yPct * dh };
+          }
+          applyBlurToRegion(
+            batchPreviewCtx,
+            sel,
+            mode,
+            blurAmount,
+            motionAngle,
+            radCenter,
+          );
+        }
+
+        // Store blurred data for comparison
+        selectedBatchItem.blurredData = batchPreviewCtx.getImageData(
+          0,
+          0,
+          dw,
+          dh,
+        );
+        console.log("[BatchPreview] updated successfully");
+      }
+
+      /* ── Redraw batch preview (used when blur params change) ─────────── */
+      function redrawBatchPreview() {
+        if (!batchMode || !selectedBatchItem) return;
+        updateBatchPreview();
+      }
+
+      function createFileItemNode(item) {
+        const div = document.createElement("div");
+        div.id = item.uid;
+        div.className = "file-item";
+        div.innerHTML = buildFileItemHTML(item);
+        div.addEventListener("click", () => {
+          // If processed, show result modal; otherwise select for preview
+          if (item.status === "done" && item.resultDataURL) {
+            openResultModal(item);
+          } else {
+            selectBatchItem(item);
+          }
+        });
+        fileItemsEl.appendChild(div);
+      }
+
+      /* ── Update an existing DOM node for a file item ─────────────────── */
+      function renderFileItem(item) {
+        const node = document.getElementById(item.uid);
+        if (!node) return;
+        node.className =
+          `file-item ${item.status === "pending" ? "" : item.status}`.trim();
+        node.innerHTML = buildFileItemHTML(item);
+      }
+
+      function buildFileItemHTML(item) {
+        const dict = LANGS[currentLang];
+        let iconHtml = "";
+        if (item.status === "processing") {
+          iconHtml = '<div class="spinner"></div>';
+        } else if (item.status === "done") {
+          iconHtml =
+            '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>';
+        } else if (item.status === "error") {
+          iconHtml =
+            '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+        }
+        // Show different hint based on status
+        let statusText =
+          {
+            pending: dict.statusPending,
+            processing: dict.statusProcessing,
+            done: dict.statusDone,
+            error: dict.statusError,
+          }[item.status] || "";
+        if (item.status === "done") {
+          statusText = dict.clickToViewResult;
+        } else if (item.status === "pending") {
+          statusText = dict.clickToPreview;
+        }
+        // Show result thumbnail if processed, otherwise show original thumbnail
+        const thumbSrc =
+          item.status === "done" && item.resultThumbURL
+            ? item.resultThumbURL
+            : item.thumbURL || PLACEHOLDER_THUMB;
+        const shortName =
+          item.name.length > 24 ? item.name.slice(0, 21) + "…" : item.name;
+        return `
+          <img class="file-thumb" src="${thumbSrc}" alt="" />
+          <div class="file-info">
+            <div class="file-name" title="${item.name}">${shortName}</div>
+            <div class="file-status">${statusText}</div>
+          </div>
+          <div class="file-status-icon">${iconHtml}</div>
+        `;
+      }
+
+      /* ── Batch apply ─────────────────────────────────────────────────── */
+      batchApplyBtn.addEventListener("click", async () => {
+        if (batchProcessing || !batchFiles.length) return;
+        batchProcessing = true;
+        batchApplyBtn.disabled = true;
+        batchDownloadBtn.disabled = true;
+        progressWrap.classList.add("visible");
+
+        const total = batchFiles.length;
+        let done = 0;
+
+        for (let idx = 0; idx < total; idx++) {
+          const item = batchFiles[idx];
+          // Wait for image to load if not yet ready
+          if (!item.img) {
+            await new Promise((res) => {
+              const check = setInterval(() => {
+                if (item.img) {
+                  clearInterval(check);
+                  res();
+                }
+              }, 50);
+            });
+          }
+
+          item.status = "processing";
+          renderFileItem(item);
+          updateBatchProgress(done, total);
+
+          try {
+            item.resultDataURL = await processBatchItem(item);
+            item.status = "done";
+          } catch (e) {
+            item.status = "error";
+          }
+
+          done++;
+          renderFileItem(item);
+          updateBatchProgress(done, total);
+
+          // Yield to UI thread between items
+          await new Promise((r) => setTimeout(r, 0));
+        }
+
+        batchProcessing = false;
+        batchApplyBtn.disabled = false;
+        batchDownloadBtn.disabled = false;
+        toast(LANGS[currentLang].toastBatchDone, 3000);
+      });
+
+      /* ── Process a single batch item → returns dataURL ───────────────── */
+      function processBatchItem(item) {
+        return new Promise((resolve, reject) => {
+          try {
+            const img = item.img;
+            const w = img.naturalWidth;
+            const h = img.naturalHeight;
+
+            const cvs = document.createElement("canvas");
+            cvs.width = w;
+            cvs.height = h;
+            const c = cvs.getContext("2d");
+            c.drawImage(img, 0, 0, w, h);
+
+            const sel = { x: 0, y: 0, w, h };
+            // Calculate radial center from sliders (always use slider values for consistency)
+            let radCenter = { x: w / 2, y: h / 2 }; // default center
+            if (mode === "radial") {
+              const xPct = +batchRadialX.value / 100;
+              const yPct = +batchRadialY.value / 100;
+              radCenter = {
+                x: xPct * w,
+                y: yPct * h,
+              };
+            }
+            applyBlurToRegion(c, sel, mode, blurAmount, motionAngle, radCenter);
+
+            const resultDataURL = cvs.toDataURL("image/png");
+
+            // Generate result thumbnail
+            const thumbCvs = document.createElement("canvas");
+            thumbCvs.width = 36;
+            thumbCvs.height = 36;
+            const tctx = thumbCvs.getContext("2d");
+            tctx.drawImage(cvs, 0, 0, w, h, 0, 0, 36, 36);
+            item.resultThumbURL = thumbCvs.toDataURL("image/jpeg", 0.75);
+
+            resolve(resultDataURL);
+          } catch (e) {
+            reject(e);
+          }
+        });
+      }
+
+      /* ── Update progress bar ─────────────────────────────────────────── */
+      function updateBatchProgress(done, total) {
+        const pct = total ? Math.round((done / total) * 100) : 0;
+        progressFill.style.width = pct + "%";
+        progressLabel.textContent = `${done} / ${total}`;
+      }
+
+      /* ── Batch download ZIP ──────────────────────────────────────────── */
+      batchDownloadBtn.addEventListener("click", async () => {
+        const readyItems = batchFiles.filter(
+          (f) => f.status === "done" && f.resultDataURL,
+        );
+        if (!readyItems.length) return;
+
+        batchDownloadBtn.disabled = true;
+        batchDownloadBtn.querySelector("span").textContent =
+          LANGS[currentLang].processing;
+
+        const zip = new JSZip();
+        readyItems.forEach((item, i) => {
+          const base = item.name.replace(/\.[^.]+$/, "");
+          const dataStr = item.resultDataURL.split(",")[1];
+          zip.file(`blurred_${base}.png`, dataStr, { base64: true });
+        });
+
+        const blob = await zip.generateAsync({ type: "blob" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "simpleblur_batch.zip";
+        a.click();
+        URL.revokeObjectURL(url);
+
+        batchDownloadBtn.disabled = false;
+        batchDownloadBtn.querySelector("span").textContent =
+          LANGS[currentLang].batchDownloadBtn;
+        toast(LANGS[currentLang].toastZipReady, 2500);
+      });
+
+      /* ── Result Modal ───────────────────────────────────────────────── */
+      let currentModalItem = null;
+
+      function openResultModal(item) {
+        if (!item.resultDataURL) return;
+        currentModalItem = item;
+        modalFilename.textContent = item.name;
+        modalImage.src = item.resultDataURL;
+        resultModal.classList.add("visible");
+        document.body.style.overflow = "hidden";
+      }
+
+      function closeResultModal() {
+        resultModal.classList.remove("visible");
+        modalImage.src = "";
+        currentModalItem = null;
+        document.body.style.overflow = "";
+      }
+
+      modalClose.addEventListener("click", closeResultModal);
+      resultModal.addEventListener("click", (e) => {
+        if (e.target === resultModal) closeResultModal();
+      });
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && resultModal.classList.contains("visible")) {
+          closeResultModal();
+        }
+      });
+
+      modalDownload.addEventListener("click", () => {
+        if (!currentModalItem || !currentModalItem.resultDataURL) return;
+        const a = document.createElement("a");
+        a.href = currentModalItem.resultDataURL;
+        a.download =
+          "blurred_" + currentModalItem.name.replace(/\.[^.]+$/, "") + ".png";
+        a.click();
+      });
+
+      /* ── Compare button (hold to see original) ──────────────────────── */
+      function showBatchOriginal() {
+        if (!selectedBatchItem || !selectedBatchItem.originalData) return;
+        batchPreviewCtx.putImageData(selectedBatchItem.originalData, 0, 0);
+      }
+      function showBatchBlurred() {
+        if (!selectedBatchItem || !selectedBatchItem.blurredData) return;
+        batchPreviewCtx.putImageData(selectedBatchItem.blurredData, 0, 0);
+      }
+
+      compareBtn.addEventListener("mousedown", showBatchOriginal);
+      compareBtn.addEventListener("mouseup", showBatchBlurred);
+      compareBtn.addEventListener("mouseleave", showBatchBlurred);
+      compareBtn.addEventListener("touchstart", (e) => {
+        e.preventDefault();
+        showBatchOriginal();
+      });
+      compareBtn.addEventListener("touchend", (e) => {
+        e.preventDefault();
+        showBatchBlurred();
+      });
+
+      /* ── Batch reset ─────────────────────────────────────────────────── */
+      batchResetBtn.addEventListener("click", () => {
+        batchFiles = [];
+        selectedBatchItem = null;
+        batchRadialCenter = null;
+        fileItemsEl.innerHTML = "";
+        fileListEl.classList.remove("visible");
+        progressWrap.classList.remove("visible");
+        batchPreviewWrap.classList.remove("visible");
+        batchPreviewWrap.style.display = "none";
+        batchPreviewCtx.clearRect(
+          0,
+          0,
+          batchPreviewCanvas.width,
+          batchPreviewCanvas.height,
+        );
+        uploadZone.style.display = "flex";
+        batchDownloadBtn.disabled = true;
+        batchApplyBtn.disabled = true;
+        $("file-input").value = "";
+        toast(LANGS[currentLang].toastReset);
+      });
+
       /* ── Step helper ─────────────────────────────────────────────────── */
       function updateSteps(completed) {
         for (let i = 1; i <= 4; i++) {
@@ -1721,10 +3059,5 @@
           showRadialDot(radialCenter.x, radialCenter.y);
       });
     </script>
-    <script
-      async
-      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1352669467098863"
-      crossorigin="anonymous"
-    ></script>
   </body>
 </html>
